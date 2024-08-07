@@ -65,14 +65,14 @@
           ".msftconnecttest.com",
           ".wotgame.cn",
           ".wggames.cn",
-          ".wowsgame.cn",
-          ".wargaming.net"
+          ".wowsgame.cn"
         ],
         "server": "domestic-dns",
         "disable_cache": true
       },
       {
         "domain_suffix": [
+          ".wargaming.net",
           ".steamcontent.com"
         ],
         "server": "proxy-dns",
@@ -134,7 +134,10 @@
             "invert": true
           },
           {
-            "rule_set": "大陆相关-IP"
+            "rule_set": [
+              "大陆相关-IP",
+              "推送服务-IP"
+            ]
           }
         ],
         "server": "domestic-dns"
@@ -259,7 +262,7 @@
         "{all}"
       ],
       "filter":[
-        {"action":"include","keywords":["Mos|CN|MG"]}
+        {"action":"include","keywords":["Mos"]}
       ],
       "interrupt_exist_connections": false
     },
@@ -270,7 +273,7 @@
         "{all}"        
       ],
       "filter":[
-        {"action":"include","keywords":["Mos|CN|MG"]}
+        {"action":"include","keywords":["Mos"]}
       ],
       "url": "https://www.baidu.com/generate_204",
       "interval": "60m",
