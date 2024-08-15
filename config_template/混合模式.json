@@ -14,14 +14,12 @@
     "servers": [
       {
         "tag": "default-dns",
-        "address": "https://1.12.12.12/dns-query",
+        "address": "223.5.5.5",
         "detour": "国内出口"
       },
       {
         "tag": "proxyserver-dns",
-        "address": "https://dns.alidns.com/dns-query",
-        "address_resolver": "default-dns",
-        "address_strategy": "ipv4_only",
+        "address": "https://223.5.5.5/dns-query",
         "detour": "节点域名解析"
       },
       {
@@ -64,26 +62,6 @@
           "虎牙-PCDN｜MCDN-域名"
         ],
         "server": "nxdomain",
-        "disable_cache": true
-      },
-      {
-        "domain_suffix": [
-          ".market.xiaomi.com",
-          ".msftncsi.com",
-          ".msftconnecttest.com",
-          ".wotgame.cn",
-          ".wggames.cn",
-          ".wowsgame.cn"
-        ],
-        "server": "domestic-dns",
-        "disable_cache": true
-      },
-      {
-        "domain_suffix": [
-          ".wargaming.net",
-          ".steamcontent.com"
-        ],
-        "server": "proxy-dns",
         "disable_cache": true
       },
       {
@@ -175,13 +153,10 @@
       "sniff_override_destination": false
     },
     {
-      "tag": "tun",
-      "type": "tun",
-      "interface_name": "ifb3",
-      "inet4_address": "172.19.0.0/16",
-      "strict_route": true,
-      "auto_route": true,
-      "stack": "mixed",
+      "tag": "tproxy",
+      "type": "tproxy",
+      "listen": "::",
+      "listen_port": 1536,
       "sniff": true,
       "sniff_override_destination": false
     }
@@ -200,22 +175,6 @@
       "type": "dns"
     },
     {
-      "tag": "Dxy",
-      "type": "vmess",
-      "server": "vtoo.dxy5213.top",
-      "server_port": 3884,
-      "uuid": "2a2187c1-1b61-401d-9c2f-3af90b5c0a61",
-      "security": "auto",
-      "alter_id": 0,
-      "transport": {
-        "type": "ws",
-        "headers": {
-          "Host": "gw.alicdn.com"
-        },
-        "path": "/"
-      }
-    },
-    {
       "tag": "国外出口",
       "type": "selector",
       "outbounds": [
@@ -223,7 +182,7 @@
         "{all}"
       ],
       "filter":[
-        {"action":"exclude","keywords":["Mos|CN|MG"]}
+        {"action":"exclude","keywords":["Mos|CN|MG|Dxy|30M"]}
       ],
       "interrupt_exist_connections": false
     },
@@ -232,11 +191,10 @@
       "type": "selector",
       "outbounds": [
         "国内自动选择",
-        "Dxy",
         "{all}"
       ],
       "filter":[
-        {"action":"include","keywords":["Mos|CN|MG"]}
+        {"action":"include","keywords":["Mos|CN|MG|Dxy|30M"]}
       ],
       "interrupt_exist_connections": false
     },
@@ -247,7 +205,7 @@
         "{all}"
       ],
       "filter":[
-        {"action":"exclude","keywords":["Mos|CN|MG"]}
+        {"action":"exclude","keywords":["Mos|CN|MG|Dxy|30M"]}
       ],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "60m",
@@ -259,11 +217,10 @@
       "tag": "国内自动选择",
       "type": "urltest",
       "outbounds": [
-        "Dxy",
         "{all}"
       ],
       "filter":[
-        {"action":"include","keywords":["Mos|CN|MG"]}
+        {"action":"include","keywords":["Mos|CN|MG|Dxy|30M"]}
       ],
       "url": "https://www.baidu.com/generate_204",
       "interval": "60m",
@@ -279,7 +236,7 @@
         "{all}"
       ],
       "filter":[
-        {"action":"include","keywords":["Mos"]}
+        {"action":"include","keywords":["Mos|CN|MG|30M"]}
       ],
       "interrupt_exist_connections": false
     },
@@ -290,7 +247,7 @@
         "{all}"
       ],
       "filter":[
-        {"action":"include","keywords":["Mos"]}
+        {"action":"include","keywords":["Mos|CN|MG|30M"]}
       ],
       "url": "https://www.baidu.com/generate_204",
       "interval": "60m",
@@ -525,7 +482,6 @@
       }
     ],
     "final": "国外出口",
-    "auto_detect_interface": true,
     "find_process": true
   },
   "experimental": {
