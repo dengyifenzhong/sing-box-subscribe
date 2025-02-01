@@ -1,0 +1,309 @@
+{
+	"log": {
+		"level": "info",
+		"output": "sing-box.log",
+		"timestamp": true
+	},
+	"dns": {
+		"fakeip": {
+			"enabled": true,
+			"inet4_range": "198.18.0.0/15",
+			"inet6_range": "fc00::/18"
+		},
+		"servers": [
+			{
+				"tag": "cloudflare-udp",
+				"address": "1.1.1.1",
+				"detour": "proxy"
+			},
+			{
+				"tag": "dnspod-udp",
+				"address": "119.29.29.29",
+				"detour": "direct"
+			},
+			{
+				"tag": "yadns",
+				"address": "https://139.224.50.204/Eaf9nie7quee/endusers",
+				"detour": "direct"
+			},
+			{
+                "tag": "block",
+                "address": "rcode://success"
+            },
+			{
+				"tag": "fakedns",
+				"address": "fakeip"
+			}
+		],
+		"rules": [
+			{
+				"outbound": "any",
+				"server": "yadns",
+				"disable_cache": true
+			},
+		    {
+                "rule_set": [
+                    "domain-direct"
+                ],
+                "server": "dnspod-udp"
+            },
+            {
+                "rule_set": [
+                    "domain-proxy"
+                ],
+                "server": "cloudflare-udp"
+            },
+            {
+                "rule_set": [
+                    "domain-block",
+                    "AWAvenue-Ads"
+                ],
+                "server": "block",
+                "disable_cache": true
+            },
+			{
+				"rule_set": [
+					"domain-bytedance",
+					"domain-microsoft@cn",
+					"domain-cn",
+					"domain-apple@cn",
+					"domain-category-games@cn"
+				],
+				"server": "dnspod-udp"
+			},
+			{
+				"rule_set": [
+					"domain-tiktok"
+				],
+				"server": "cloudflare-udp"
+			},
+			{
+                "type": "logical",
+                "mode": "and",
+                "rules": [
+                   {
+                       "rule_set": "domain-geolocation-!cn",
+                       "invert": true
+                   },
+                   {
+                       "rule_set": "ip-cn"
+                   }
+                ],
+                "server": "cloudflare-udp",
+                "client_subnet": "114.114.114.114"
+            }
+		],
+		"strategy": "ipv4_only",
+		"final": "cloudflare-udp",
+		"reverse_mapping": true,
+		"independent_cache": true
+	},
+	"inbounds": [
+		{
+			"type": "mixed",
+			"tag": "mixed-in",
+			"listen": "::",
+			"listen_port": 1080
+		},
+		{
+			"type": "tproxy",
+			"tag": "tproxy-in",
+			"listen": "::",
+			"listen_port": 1536
+		}
+	],
+	"outbounds": [
+		{
+			"type": "direct",
+			"tag": "direct"
+		},
+		{
+			"type": "selector",
+			"tag": "proxy",
+			"outbounds": [
+				"{all}"
+			]
+		}
+	],
+	"route": {
+	    "rule_set": [
+			{
+                "type": "local",
+                "tag": "domain-block",
+                "format": "source",
+                "path": "./source/domain-block.json"
+            },
+            {
+                "type": "local",
+                "tag": "domain-direct",
+                "format": "source",
+                "path": "./source/domain-direct.json"
+            },
+            {
+                "type": "local",
+                "tag": "domain-proxy",
+                "format": "source",
+                "path": "./source/domain-proxy.json"
+            },
+            {
+                "tag": "AWAvenue-Ads",
+                "type": "remote",
+                "update_interval": "24h",
+                "download_detour": "proxy",
+                "url": "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Singbox.srs",
+                "format": "binary"                
+            },
+			{
+				"tag": "ip-cn",
+				"type": "remote",
+				"update_interval": "24h",
+				"download_detour": "proxy",
+				"url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geoip/cn.srs",
+				"format": "binary"
+			},
+			{
+				"tag": "ip-private",
+				"type": "remote",
+				"update_interval": "24h",
+				"download_detour": "proxy",
+				"url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geoip/private.srs",
+				"format": "binary"
+			},
+			{
+				"tag": "domain-tiktok",
+				"type": "remote",
+				"update_interval": "24h",
+				"download_detour": "proxy",
+				"url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/tiktok.srs",
+				"format": "binary"
+			},
+			{
+				"tag": "domain-bytedance",
+				"type": "remote",
+				"update_interval": "24h",
+				"download_detour": "proxy",
+				"url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/bytedance.srs",
+				"format": "binary"
+			},
+			{
+				"tag": "domain-microsoft@cn",
+				"type": "remote",
+				"update_interval": "24h",
+				"download_detour": "proxy",
+				"url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/microsoft@cn.srs",
+				"format": "binary"
+			},
+			{
+				"tag": "domain-apple@cn",
+				"type": "remote",
+				"update_interval": "24h",
+				"download_detour": "proxy",
+				"url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/apple@cn.srs",
+				"format": "binary"
+			},
+			{
+				"tag": "domain-category-games@cn",
+				"type": "remote",
+				"update_interval": "24h",
+				"download_detour": "proxy",
+				"url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/category-games@cn.srs",
+				"format": "binary"
+			},
+			{
+				"tag": "domain-category-ads-all",
+				"type": "remote",
+				"update_interval": "24h",
+				"download_detour": "proxy",
+				"url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/category-ads-all.srs",
+				"format": "binary"
+			},
+			{
+				"tag": "domain-cn",
+				"type": "remote",
+				"update_interval": "24h",
+				"download_detour": "proxy",
+				"url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/cn.srs",
+				"format": "binary"
+			},
+			{
+				"tag": "domain-geolocation-!cn",
+				"type": "remote",
+				"update_interval": "24h",
+				"download_detour": "proxy",
+				"url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/geolocation-!cn.srs",
+				"format": "binary"
+			}
+		],
+		"rules": [
+			{
+				"action": "sniff"
+			},
+			{
+				"type": "logical",
+				"mode": "or",
+				"rules": [
+					{
+						"protocol": "dns"
+					},
+					{
+						"port": 53
+					}
+				],
+				"action": "hijack-dns"
+			},
+			{
+                "rule_set": [
+                    "domain-direct"
+                ],
+                "outbound": "direct"
+            },
+            {
+                "rule_set": [
+                    "domain-proxy"
+                ],
+                "outbound": "proxy"
+            },
+            {
+                "rule_set": [
+                    "domain-block",
+                    "AWAvenue-Ads"
+                ],
+                "action": "reject"
+            },
+			{
+				"ip_is_private": true,
+				"outbound": "direct"
+			},
+			{
+				"rule_set": [
+					"domain-apple@cn",
+					"domain-category-games@cn",
+					"domain-cn"
+				],
+				"outbound": "direct"
+			},
+			{
+				"rule_set": [
+					"ip-cn"
+				],
+				"outbound": "direct"
+			}
+		],
+		"find_process": true,
+		"final": "proxy"
+	},
+	"experimental": {
+		"clash_api": {
+			"external_controller": "127.0.0.1:9999",
+			"external_ui": "ui",
+			"external_ui_download_url": "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
+			"external_ui_download_detour": "proxy",
+			"default_mode": "rule"
+		},
+		"cache_file": {
+			"enabled": true,
+			"path": "cache.db",
+			"store_fakeip": false
+		}
+	}
+}
